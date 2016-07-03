@@ -1,6 +1,3 @@
-#include <string>
-#include <vector>
-
 #include "rma.h"
 
 #ifndef ASP_H
@@ -11,8 +8,9 @@ public:
 
         ASP();
         void add(std::string s);
+        friend std::ostream& operator<<(std::ostream &, const ASP &);
 private:
-        std::vector<RMA> nm;
+        std::map<std::string, std::vector<RMA> > m_row;
 };
 
 #endif
