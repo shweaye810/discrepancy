@@ -23,9 +23,20 @@ void RMA::add()
         int qty = stoi(Tokenizer::get_token());
         string loc = Tokenizer::get_token();
         string tmp(lower(loc));
-        if (!m_info.empty() && m_info.find(rma_nm) != m_info.end()) {
-                auto nf = m_info.at(rma_nm);
-                for (auto itr = nf.begin(); itr != nf.end(); ++itr) {
+        if (m_info.find(rma_nm) == m_info.end()) {
+                Info nf(pn, mdl);
+                if (tmp == "rtv") {
+                        nf.m_rtv = qty;
+                } else if (tmp == "elm") {
+                        nf.m_elm = qty;
+                }
+                //vector<Info> vt;
+                //vt.push_back(nf);
+                m_info[rma_nm].push_back(nf);
+                cout << m_info.size();
+        } else {
+                auto &vt = m_info.at(rma_nm);
+                for (auto itr = vt.begin(); itr != vt.end(); ++itr) {
                         if (itr->m_pn == pn) {
                                 if (tmp == "rtv") {
                                         itr->m_rtv += qty;
@@ -34,14 +45,7 @@ void RMA::add()
                                 }
                         }
                 }
-        } else {
-                Info nf(pn, mdl);
-                if (tmp == "rtv") {
-                        nf.m_rtv = qty;
-                } else if (tmp == "elm") {
-                        nf.m_elm = qty;
-                }
-                m_info[rma_nm].push_back(nf);
+
         }
 }
 
