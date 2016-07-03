@@ -15,7 +15,7 @@ int main()
         ofstream fout;
         ifstream fin;
         string in_nm("test.txt"), out_nm("output.txt"), tmp, row;
-        cout << "Trying to open test.txt.\n";
+        cout << "Trying to open " << in_nm << ".\n";
         fin.open(in_nm.c_str());
         /*        cout << "Please enter the file name: " << flush ;
                   cin >> in_nm;
@@ -32,13 +32,9 @@ int main()
                 return -1;
         }
         ASP list;
-        int i = 0;
-        do {
+        while (getline(fin, row)) {
                 stringstream ss;
-                getline(fin, row);
                 list.add(row);
-                cout << list;
-
                 /*
                   ss.str(tmp);
                   for (int i = 0; getline(ss, tmp, '\t'); ++i) {
@@ -46,9 +42,12 @@ int main()
                   }
                   fout << endl;
                 */
-        } while(fin.good());
+        }
+        fout << "ASP\tCOD\tASUS_PN\tPart_Name\tELM\tRTV\txtra_qty\tSUB_PN\tSUB_QTY\n";
+        fout << list << endl;
         fin.close();
         fout.close();
+        cout << "Data has been written into " << out_nm << ".\n";
         cout << "End of program.\n" << flush;
         return 0;
 }
