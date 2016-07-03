@@ -6,6 +6,14 @@ RMA::RMA()
 {
 }
 
+string lower(string s)
+{
+        for (auto itr = s.begin(); itr != s.end(); ++itr) {
+                *itr = tolower(*itr);
+        }
+        return s;
+}
+
 void RMA::add()
 {
         string rma_nm = Tokenizer::get_token();
@@ -13,8 +21,14 @@ void RMA::add()
         string mdl = Tokenizer::get_token();
         int qty = stoi(Tokenizer::get_token());
         string loc = Tokenizer::get_token();
-        Info nf(pn, mdl, qty, loc);
-        m_info[rma_nm].push_back(nf);
+        string tmp(lower(loc));
+        Info nf(pn, mdl);
+        if (tmp == "rtv") {
+                nf.m_rtv = qty;
+        } else if (tmp == "elm") {
+                nf.m_elm = qty;
+        }
+        //m_info[rma_nm].push_back(nf);
 }
 
 ostream& operator<<(ostream &cout, const RMA &rma)
@@ -23,7 +37,7 @@ ostream& operator<<(ostream &cout, const RMA &rma)
                 for (auto iitr = itr->second.begin();
                      iitr != itr->second.end();
                      ++iitr) {
-                        cout << itr->first << '\t' << *iitr << endl;
+                        cout << itr->first << '\t' << *iitr;
                 }
         }
         return cout;
