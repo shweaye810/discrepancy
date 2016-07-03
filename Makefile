@@ -1,4 +1,4 @@
-CC = g++ -std=c++14
+CC = g++ -std=c++1y
 CFLAGS = -c -g -Wall
 PROG = discrepancy
 
