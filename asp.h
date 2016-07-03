@@ -10,7 +10,7 @@ public:
         void add(std::string s);
         friend std::ostream& operator<<(std::ostream &, const ASP &);
 private:
-        std::map<std::string, std::vector<RMA> > m_row;
+        std::map<std::string, RMA> m_row;
 };
 
 #endif
