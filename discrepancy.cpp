@@ -46,8 +46,6 @@ int main()
                   }
                   fout << endl;
                 */
-                cout << i << endl;
-                ++i;
         } while(fin.good());
         fin.close();
         fout.close();
