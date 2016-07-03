@@ -4,36 +4,24 @@
 
 using namespace std;
 
-#define TAB '\t'
-
-Info::Info(string part_n, string model, int qty, string loc) :
-        m_pn(part_n), m_mdl(model), m_qty(qty), m_loc(loc)
+Info::Info(string part_n, string model) :
+        m_pn(part_n), m_mdl(model), m_elm(0), m_rtv(0), xtr_qty(0)
 {
 }
 
-Info::Info(const Info &o) : m_pn(o.m_pn), m_mdl(o.m_mdl)
+Info::Info(const Info &o) : m_pn(o.m_pn), m_mdl(o.m_mdl),
+                            m_elm(o.m_elm), m_rtv(o.m_rtv), xtr_qty(o.xtr_qty),
+                            m_sub(o.m_sub)
 {
-
-}
-
-string lower(string s)
-{
-        for (auto itr = s.begin(); itr != s.end(); ++itr) {
-                s = tolower(*itr);
-        }
-        return s;
 }
 
 ostream& operator<<(ostream &cout, const Info &info)
 {
-
-        cout << info.m_pn << '\t' << info.m_mdl << '\t';
-        if (lower(info.m_loc) == "rtv") {
-                cout << 0 << '\t' << info.m_qty << '\t';
-        } else if (lower(info.m_loc) == "elm") {
-                cout << info.m_qty << '\t' << 0 << '\t';
+        cout << info.m_pn << '\t' << info.m_mdl << '\t'
+             << info.m_elm << info.m_rtv
+             << info.xtr_qty << '\t' << info.m_sub.size() << '\t';
+        for (auto itr = info.m_sub.begin(); itr != info.m_sub.end(); ++itr) {
+                cout << itr->first << '\t' << itr->second << '\t';
         }
-        cout << info.xtr_qty << '\t' <<
-                info.sb_tot_qty <<  '\t';
         return cout;
 }
