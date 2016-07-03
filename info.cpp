@@ -18,7 +18,7 @@ Info::Info(const Info &o) : m_pn(o.m_pn), m_mdl(o.m_mdl),
 ostream& operator<<(ostream &cout, const Info &info)
 {
         cout << info.m_pn << '\t' << info.m_mdl << '\t'
-             << info.m_elm << info.m_rtv
+             << info.m_elm << '\t' << info.m_rtv << '\t'
              << info.xtr_qty << '\t' << info.m_sub.size() << '\t';
         for (auto itr = info.m_sub.begin(); itr != info.m_sub.end(); ++itr) {
                 cout << itr->first << '\t' << itr->second << '\t';
