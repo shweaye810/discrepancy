@@ -23,17 +23,15 @@ void RMA::add()
         int qty = stoi(Tokenizer::get_token());
         string loc = Tokenizer::get_token();
         string tmp(lower(loc));
+        Info nf(pn, mdl);
+        if (tmp == "rtv") {
+                nf.m_rtv = qty;
+        } else if (tmp == "elm") {
+                nf.m_elm = qty;
+        }
+
         if (m_info.find(rma_nm) == m_info.end()) {
-                Info nf(pn, mdl);
-                if (tmp == "rtv") {
-                        nf.m_rtv = qty;
-                } else if (tmp == "elm") {
-                        nf.m_elm = qty;
-                }
-                //vector<Info> vt;
-                //vt.push_back(nf);
                 m_info[rma_nm].push_back(nf);
-                cout << m_info.size();
         } else {
                 auto &vt = m_info.at(rma_nm);
                 for (auto itr = vt.begin(); itr != vt.end(); ++itr) {
@@ -43,19 +41,34 @@ void RMA::add()
                                 } else if (tmp == "elm") {
                                         itr->m_elm += qty;
                                 }
+                                return;
                         }
                 }
-
+                m_info[rma_nm].push_back(nf);
+                cout << m_info.size();
         }
 }
 
+void RMA::print(ostream &cout, const std::string &s) const
+{
+        for (auto itr = this->m_info.begin();
+             itr != this->m_info.end();
+             ++itr) {
+                for (auto iitr = itr->second.begin();
+                     iitr != itr->second.end();
+                     ++iitr) {
+                        cout << s << '\t' << itr->first << '\t' << *iitr;
+                        cout << endl;
+                }
+        }
+}
 ostream& operator<<(ostream &cout, const RMA &rma)
 {
         for (auto itr = rma.m_info.begin(); itr != rma.m_info.end(); ++itr) {
                 for (auto iitr = itr->second.begin();
                      iitr != itr->second.end();
                      ++iitr) {
-                        cout << itr->first << '\t' << *iitr;
+                        cout << itr->first << '\t' << *iitr << endl;
                 }
         }
         return cout;
