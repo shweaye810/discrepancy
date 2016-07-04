@@ -46,7 +46,7 @@ int main()
                 */
         }
         fout << "ASP\tCOD\tASUS_PN\tPart_Name\tELM\tRTV\txtra_qty\tSUB_PN\tSUB_QTY\n";
-        fout << list << endl;
+        fout << list;
         fin.close();
         fout.close();
         cout << "Data has been written into " << out_nm << ".\n";
