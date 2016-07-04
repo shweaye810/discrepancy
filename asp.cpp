@@ -30,7 +30,8 @@ ostream& operator<<(ostream &cout, const ASP &asp)
                      ++iitr) {
                         cout << itr->first << '\t' << *iitr << endl;
                         }*/
-                cout << itr->first << '\t' << itr->second << endl;
+                //cout << itr->first << '\t' << itr->second;
+                itr->second.print(cout, itr->first);
         }
         return cout;
 }
