@@ -33,6 +33,8 @@ int main()
         }
         ASP list;
         while (getline(fin, row)) {
+                if (row.empty())
+                        continue;
                 stringstream ss;
                 list.add(row);
                 /*
