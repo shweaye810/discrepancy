@@ -35,3 +35,11 @@ ostream& operator<<(ostream &cout, const ASP &asp)
         }
         return cout;
 }
+
+void ASP::calc_qty()
+{
+        for (auto itr = asp.m_row.begin(); itr != asp.m_row.end(); ++itr) {
+                itr->second.RMA_qty_calc();
+        }
+        return cout;
+}
