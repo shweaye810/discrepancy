@@ -14,7 +14,7 @@ public:
         friend class RMA;
 private:
         std::string m_pn, m_mdl;
-        int m_elm, m_rtv, xtr_qty;
+        int m_elm, m_rtv, xtr_qty, m_sub_tot;
         std::map<std::string, int> m_sub;
 };
 
