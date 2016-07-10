@@ -45,8 +45,13 @@ int main()
                   fout << endl;
                 */
         }
-        fout << "ASP\tCOD\tASUS_PN\tPart_Name\tELM\tRTV\txtra_qty\tSUB_PN\tSUB_QTY\n";
+        list.calc_qty();
+        list.substitude_PN();
+        fout << "ASP\tCOD\tASUS_PN\tPart_Name\tELM\tRTV\txtra_qty\t"
+                "SUB_TOT_QTY\tSUB_PN\tSUB_QTY\n"
+                ;
         fout << list;
+
         fin.close();
         fout.close();
         cout << "Data has been written into " << out_nm << ".\n";
