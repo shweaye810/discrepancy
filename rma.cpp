@@ -1,5 +1,7 @@
-#include "rma.h"
+#include <cstdlib>
 #include <exception>
+
+#include "rma.h"
 
 using namespace std;
 
@@ -22,6 +24,45 @@ inline void RMA::proc_loc(Info &nf, const string &tmp, int qty)
                 nf.m_elm += qty;
         }
 }
+
+inline int get_qty(const Info &l, const Info &r)
+{
+        return abs(l.extra_qty()) < r.extra_qty() ?
+                                    abs(l.extra_qty()) : r.extra_qty();
+}
+void RMA::full_PN_substitude()
+{
+        for (auto i = m_info.begin(); i != m_info.end(); i++) {
+                for (auto j = i->second.begin(); j != i->second.end(); j++) {
+                        if (j->is_done() || j->xtr_qty >= 0) {
+                                continue;
+                        }
+                        for (auto k = i->second.begin(); k != i->second.end(); k++) {
+                                if (k->is_done()) {
+                                        continue;
+                                }
+                                if ((j != k && k->xtr_qty > 0) &&
+                                    (j->m_mdl.find(k->m_mdl) != string::npos ||
+                                     k->m_mdl.find(j->m_mdl) != string::npos)) {
+                                        //int qty = abs(j->xtr_qty) < k->xtr_qty ? abs(j->xtr_qty) : k->xtr_qty;
+                                        int qty = get_qty(*j, *k);
+                                        j->m_sub[k->m_pn] = qty;
+                                        j->m_sub_tot += qty;
+                                        k->m_sub_tot -= qty;
+                                        j->calc_qty();
+                                        k->calc_qty();
+                                        if (j->is_done())
+                                                break;
+                                }
+                        }
+                }
+        }
+}
+
+void RMA::substitude_PN()
+{
+        full_PN_substitude();
+}
 /*
  *
  *
@@ -36,14 +77,14 @@ void RMA::add()
         string loc = Tokenizer::get_token();
         string tmp(lower(loc));
         Info nf(pn, mdl);
-        proc_loc(nf, tmp);
+        proc_loc(nf, tmp, qty);
         /*
          * replaced by proc_loc
-        if (tmp == "rtv") {
-                nf.m_rtv = qty;
-        } else if (tmp == "elm") {
-                nf.m_elm = qty;
-        }
+         if (tmp == "rtv") {
+         nf.m_rtv = qty;
+         } else if (tmp == "elm") {
+         nf.m_elm = qty;
+         }
         */
         if (m_info.find(rma_nm) == m_info.end()) {
                 m_info[rma_nm].push_back(nf);
@@ -54,17 +95,17 @@ void RMA::add()
                                 proc_loc(*itr, tmp, qty);
                                 /*
                                  * replace by proc_loc()
-                                if (tmp == "rtv") {
-                                        itr->m_rtv += qty;
-                                } else if (tmp == "elm") {
-                                        itr->m_elm += qty;
-                                }
+                                 if (tmp == "rtv") {
+                                 itr->m_rtv += qty;
+                                 } else if (tmp == "elm") {
+                                 itr->m_elm += qty;
+                                 }
                                 */
                                 return;
                         }
                 }
                 m_info[rma_nm].push_back(nf);
-                cout << m_info.size();
+                //cout << m_info.size();
         }
 }
 
@@ -94,20 +135,13 @@ ostream& operator<<(ostream &cout, const RMA &rma)
 
 }
 
-void RMA::do_PN_substitude()
+void RMA::calc_qty()
 {
-
-}
-
-void RMA::RMA_qty_calc()
-{
-        for (auto itr = rma.m_info.begin(); itr != rma.m_info.end(); ++itr) {
+        for (auto itr = m_info.begin(); itr != m_info.end(); ++itr) {
                 for (auto iitr = itr->second.begin();
                      iitr != itr->second.end();
                      ++iitr) {
-                        iitr->xtr_qty = m_elm - m_rtv + m_sub_tot;
+                        iitr->calc_qty();
                 }
         }
-        return cout;
-
 }
