@@ -38,8 +38,14 @@ ostream& operator<<(ostream &cout, const ASP &asp)
 
 void ASP::calc_qty()
 {
-        for (auto itr = asp.m_row.begin(); itr != asp.m_row.end(); ++itr) {
-                itr->second.RMA_qty_calc();
+        for (auto itr = m_row.begin(); itr != m_row.end(); ++itr) {
+                itr->second.calc_qty();
         }
-        return cout;
+}
+
+void ASP::substitude_PN()
+{
+        for (auto itr = m_row.begin(); itr != m_row.end(); ++itr) {
+                itr->second.substitude_PN();
+        }
 }
