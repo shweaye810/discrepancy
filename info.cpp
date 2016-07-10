@@ -20,11 +20,27 @@ Info::Info(const Info &o) : m_pn(o.m_pn), m_mdl(o.m_mdl),
 ostream& operator<<(ostream &cout, const Info &info)
 {
         cout << info.m_pn << '\t' << info.m_mdl << '\t' << info.m_elm << '\t'
-             << info.m_rtv << '\t'<< info.xtr_qty << '\t' << m_sub_tot << '\t';
+             << info.m_rtv << '\t'<< info.xtr_qty << '\t'
+             << info.m_sub_tot << '\t';
 
         for (auto itr = info.m_sub.begin(); itr != info.m_sub.end(); ++itr) {
                 cout << itr->first << '\t' << itr->second << '\t';
         }
 
         return cout;
+}
+
+bool Info::is_done()
+{
+    return xtr_qty == 0;
+}
+
+void Info::calc_qty()
+{
+    xtr_qty = m_elm - m_rtv + m_sub_tot;
+}
+
+int Info::extra_qty() const
+{
+    return xtr_qty;
 }
