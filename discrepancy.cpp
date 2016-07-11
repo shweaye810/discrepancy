@@ -4,6 +4,7 @@
 
 #include "asp.h"
 #include "tokenizer.h"
+#include "product.h"
 
 using namespace std;
 
@@ -45,6 +46,7 @@ int main()
                   fout << endl;
                 */
         }
+        Product::init();
         list.calc_qty();
         list.substitude_PN();
         fout << "ASP\tCOD\tASUS_PN\tPart_Name\tELM\tRTV\txtra_qty\t"
