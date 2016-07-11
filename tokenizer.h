@@ -9,6 +9,7 @@ public:
         static std::string get_token();
         static void set_string(std::string s);
 private:
+        Tokenizer();
         static std::stringstream ss;
 };
 
