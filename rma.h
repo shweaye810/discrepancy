@@ -3,6 +3,9 @@
 #include "info.h"
 #include "tokenizer.h"
 
+#ifndef RMA_H
+#define RMA_H
+
 class RMA{
 public:
         RMA();
@@ -14,6 +17,8 @@ public:
 private:
         std::map<std::string, std::vector<Info> > m_info;
         void proc_loc(Info &, const std::string &, int);
-        void full_PN_substitude();
-
+        void substitude_full_PN();
+        void substitude_HDD();
 };
+
+#endif
