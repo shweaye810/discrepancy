@@ -44,3 +44,52 @@ int Info::extra_qty() const
 {
     return xtr_qty;
 }
+
+bool Info::is_HDD() const
+{
+    return m_mdl.find("SATA") != string::npos &&
+        m_mdl.find("SSD") == string::npos;
+}
+
+bool Info::is_MB() const
+{
+    return m_mdl.find("MB") != string::npos ||
+        m_mdl.find("MAIN_BD") != string::npos;
+}
+
+bool Info::is_battery() const
+{
+    return m_mdl.find("BATT") != string::npos;
+}
+
+bool Info::is_adapter() const
+{
+    return m_mdl.find("ADAPTER") != string::npos;
+}
+
+
+int get_qty(const Info &l, const Info &r)
+{
+    return abs(l.extra_qty()) < r.extra_qty() ?
+                                abs(l.extra_qty()) : r.extra_qty();
+}
+
+bool Info::has_extra()
+{
+    return xtr_qty > 0;
+}
+
+void Info::substitude_PN(Info &o)
+{
+    int qty = get_qty(*this, o);
+    this->m_sub[o.m_pn] = qty;
+    this->m_sub_tot += qty;
+    o.m_sub_tot -= qty;
+    this->calc_qty();
+    o.calc_qty();
+}
+
+const string &Info::model() const
+{
+    return m_mdl;
+}
