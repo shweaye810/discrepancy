@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "rma.h"
-#include "product.h"
 
 using namespace std;
 
@@ -80,13 +79,14 @@ void RMA::substitude_HDD()
                                 if (k->is_done())
                                         continue;
                                 if (j != k && k->has_extra() && k->is_HDD()) {
-                                        using prod = Product;
+                                        /*
                                         string j_sz = get_hdd(*j, prod::HDD_sz);
                                         string k_sz = get_hdd(*k, prod::HDD_sz);
                                         string j_sp = get_hdd(*j, prod::HDD_sp);
                                         string k_sp = get_hdd(*k, prod::HDD_sp);
                                         string j_cp = get_hdd(*j, prod::HDD_cp);
                                         string k_cp = get_hdd(*k, prod::HDD_cp);
+
                                         if (((j_sz.empty() || k_sz.empty()) ||
                                              (j_sz == k_sz)) &&
                                             ((j_sp.empty() || k_sp.empty()) ||
@@ -96,7 +96,8 @@ void RMA::substitude_HDD()
                                                 j->substitude_PN(*k);
                                                 if (j->is_done())
                                                         break;
-                                        }
+                                }
+                                */
                                 }
                         }
                 }

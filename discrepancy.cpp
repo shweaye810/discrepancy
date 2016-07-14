@@ -4,11 +4,11 @@
 
 #include "asp.h"
 #include "tokenizer.h"
-#include "product.h"
 
 using namespace std;
 
-void print_error(const string &file_nm){
+void print_error(const string &file_nm)
+{
         cout << "Error opening " << file_nm << ".\n" << flush;
 }
 int main()
@@ -46,7 +46,6 @@ int main()
                   fout << endl;
                 */
         }
-        Product::init();
         list.calc_qty();
         list.substitude_PN();
         fout << "ASP\tCOD\tASUS_PN\tPart_Name\tELM\tRTV\txtra_qty\t"
