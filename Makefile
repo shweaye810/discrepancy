@@ -1,8 +1,8 @@
-CC = g++ -std=c++1y
+CC = clang++ -std=c++14 -stdlib=libc++
 CFLAGS = -c -g -Wall
 PROG = discrepancy
 
-$(PROG).out: $(PROG).o asp.o info.o rma.o tokenizer.o product.o
+$(PROG).out: $(PROG).o asp.o info.o rma.o tokenizer.o
 	$(CC) $^ -g -o $(PROG).out
 
 $(PROG).o: $(PROG).cpp
@@ -19,9 +19,6 @@ rma.o: rma.cpp rma.h
 
 tokenizer.o: tokenizer.cpp tokenizer.h
 	$(CC) $(CFLAGS) $< 
-
-product.o: product.cpp product.h
-	$(CC) $(CFLAGS) $<
 
 .PHONY: clean
 clean:
