@@ -19,6 +19,7 @@ private:
         void proc_loc(Info &, const std::string &, int);
         void substitude_full_PN();
         void substitude_HDD();
+        void substitude_all();
 };
 
 #endif
