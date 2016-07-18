@@ -1,9 +1,11 @@
 #include <cstdlib>
 #include <exception>
+#include <sstream>
 #include <vector>
+#include <regex>
 
 #include "rma.h"
-
+#include "regex_string.cpp"
 using namespace std;
 
 RMA::RMA()
@@ -41,15 +43,6 @@ void RMA::substitude_full_PN()
                                     (j->m_mdl.find(k->m_mdl) != string::npos ||
                                      k->m_mdl.find(j->m_mdl) != string::npos)) {
                                         j->substitude_PN(*k);
-                                        /*
-                                         * replace by substidude_PN(Info &)
-                                        int qty = get_qty(*j, *k);
-                                        j->m_sub[k->m_pn] = qty;
-                                        j->m_sub_tot += qty;
-                                        k->m_sub_tot -= qty;
-                                        j->calc_qty();
-                                        k->calc_qty();
-                                        */
                                         if (j->is_done())
                                                 break;
                                 }
@@ -58,14 +51,34 @@ void RMA::substitude_full_PN()
         }
 }
 
-template<typename T>
-string get_hdd(const Info &o, const T &tmp)
+string get_substr(const Info &o, const regex &rg)
 {
-        for (auto &i : tmp) {
-                if (o.model().find(i) != string::npos)
-                        return i;
-        }
-        return "";
+        smatch tmp;
+        regex_search(o.model(), tmp, rg);
+        return tmp[0];
+}
+
+bool is_same_HDD(const Info &l, const Info &r)
+{
+        string l_len(get_substr(l, regex_string::HDD_len));
+        string r_len(get_substr(r, regex_string::HDD_len));
+        string l_sp(get_substr(l, regex_string::HDD_speed));
+        string r_sp(get_substr(r, regex_string::HDD_speed));
+        string l_cap(get_substr(l, regex_string::HDD_cap));
+        string r_cap(get_substr(r, regex_string::HDD_cap));
+        return (((l_len.empty() || r_len.empty()) || l_len == r_len) &&
+                ((l_sp.empty() || r_sp.empty()) || l_sp == r_sp) &&
+                (!l_cap.empty() && !r_cap.empty() && l_cap == r_cap));
+}
+
+bool is_same_SSD(const Info &l, const Info &r)
+{
+        string l_len(get_substr(l, regex_string::HDD_len));
+        string r_len(get_substr(r, regex_string::HDD_len));
+        string l_cap(get_substr(l, regex_string::HDD_cap));
+        string r_cap(get_substr(r, regex_string::HDD_cap));
+        return (((l_len.empty() || r_len.empty()) || l_len == r_len) &&
+                (!l_cap.empty() && !r_cap.empty() && l_cap == r_cap));
 }
 
 void RMA::substitude_HDD()
@@ -79,25 +92,115 @@ void RMA::substitude_HDD()
                                 if (k->is_done())
                                         continue;
                                 if (j != k && k->has_extra() && k->is_HDD()) {
-                                        /*
-                                        string j_sz = get_hdd(*j, prod::HDD_sz);
-                                        string k_sz = get_hdd(*k, prod::HDD_sz);
-                                        string j_sp = get_hdd(*j, prod::HDD_sp);
-                                        string k_sp = get_hdd(*k, prod::HDD_sp);
-                                        string j_cp = get_hdd(*j, prod::HDD_cp);
-                                        string k_cp = get_hdd(*k, prod::HDD_cp);
-
-                                        if (((j_sz.empty() || k_sz.empty()) ||
-                                             (j_sz == k_sz)) &&
-                                            ((j_sp.empty() || k_sp.empty()) ||
-                                             (j_sp == k_sp)) &&
-                                            ((!j_cp.empty() && !k_cp.empty()) ||
-                                             (j_cp == k_cp))) {
+                                        bool eq = is_same_HDD(*j, *k);
+                                        if (eq) {
                                                 j->substitude_PN(*k);
                                                 if (j->is_done())
                                                         break;
+                                        }
                                 }
-                                */
+                        }
+                }
+        }
+}
+
+string get_product_model(string s)
+{
+        stringstream sstrm(s);
+        sstrm >> s;
+        return s;
+}
+bool is_same_MB(const Info &l, const Info &r)
+{
+        string l_mdl(get_product_model(l.model()));
+        string r_mdl(get_product_model(r.model()));
+        string l_cpu(get_substr(l, regex_string::CPU_model));
+        string r_cpu(get_substr(r, regex_string::CPU_model));
+
+        return ((!(l_mdl.empty() || r_mdl.empty()) && l_mdl == r_mdl) &&
+                ((l_cpu.empty() || r_cpu.empty()) || l_cpu == r_cpu));
+}
+
+bool is_same_adapter(const Info &l, const Info &r)
+{
+        string l_wat(get_substr(l, regex_string::adapter_watt));
+        string r_wat(get_substr(r, regex_string::adapter_watt));
+        string l_volt(get_substr(l, regex_string::adapter_volt));
+        string r_volt(get_substr(r, regex_string::adapter_volt));
+
+        return (((l_wat.empty() || r_wat.empty()) || l_wat == r_wat) &&
+                ((l_volt.empty() || r_volt.empty()) || l_volt == r_volt));
+}
+
+bool is_same_BATT(const Info &l, const Info &r)
+{
+        string l_mdl(get_product_model(l.model()));
+        string r_mdl(get_product_model(r.model()));
+
+        return (!(l_mdl.empty() || r_mdl.empty()) && l_mdl == r_mdl);
+}
+
+bool is_same_LCD(const Info &l, const Info &r)
+{
+        string l_size(get_substr(l, regex_string::LCD_size));
+        string r_size(get_substr(r, regex_string::LCD_size));
+
+        return (!(l_size.empty() || r_size.empty()) && l_size == r_size);
+}
+
+bool is_same_DDR(const Info &l, const Info &r)
+{
+        string l_size(get_substr(l, regex_string::DDR_size));
+        string r_size(get_substr(r, regex_string::DDR_size));
+        string l_speed(get_substr(l, regex_string::DDR_speed));
+        string r_speed(get_substr(r, regex_string::DDR_speed));
+
+        return ((!(l_size.empty() || r_size.empty()) && l_size == r_size) &&
+                (!(l_speed.empty() || r_speed.empty()) && l_speed == r_speed));
+}
+
+bool is_same_model(const Info &l, const Info &r)
+{
+        switch(l.product()) {
+        case Product_type::adapter:
+                return is_same_adapter(l, r);
+        case Product_type::BATT:
+                return is_same_BATT(l, r);
+        case Product_type::DDR:
+                return is_same_DDR(l, r);
+        case Product_type::HDD:
+                return is_same_HDD(l, r);
+        case Product_type::LCD:
+                return is_same_LCD(l, r);
+        case Product_type::MB:
+                return is_same_MB(l, r);
+        case Product_type::SSD:
+                return is_same_SSD(l, r);
+        default:
+                cout << "check is_same_model().\nModel: " << l.model() << '\n';
+                break;
+        }
+        return false;
+}
+
+void RMA::substitude_all()
+{
+        for (auto i = m_info.begin(); i != m_info.end(); i++) {
+                for (auto j = i->second.begin(); j != i->second.end(); j++) {
+                        if (j->is_done() || j->has_extra())
+                                continue;
+                        for (auto k = i->second.begin(); k != i->second.end();
+                             k++) {
+                                if (k->is_done())
+                                        continue;
+                                if (j != k && k->has_extra() &&
+                                    (k->product() == j->product())) {
+                                        bool eq = is_same_model(*j, *k);
+                                        if (eq) {
+                                                j->substitude_PN(*k);
+                                                if (j->is_done())
+                                                        break;
+                                        }
                                 }
                         }
                 }
@@ -107,7 +210,8 @@ void RMA::substitude_HDD()
 void RMA::substitude_PN()
 {
         substitude_full_PN();
-        substitude_HDD();
+        //        substitude_HDD();
+        substitude_all();
 }
 /*
  *
@@ -124,6 +228,7 @@ void RMA::add()
         string tmp(lower(loc));
         Info nf(pn, mdl);
         proc_loc(nf, tmp, qty);
+        nf.set_product_type();
         if (m_info.find(rma_nm) == m_info.end()) {
                 m_info[rma_nm].push_back(nf);
         } else {
