@@ -1,0 +1,1 @@
+A program to help with discrepancy and inventory (if supply the right columns). Simply run "make" and executable file. GCC or equivalent c++14 compiler requires.
