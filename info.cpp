@@ -61,7 +61,8 @@ bool Info::is_MB() const
 
 bool Info::is_BATT() const
 {
-        return m_mdl.find("BATT") != string::npos;
+        return m_mdl.find("BATT") != string::npos ||
+		m_mdl.find(" BAT") != string::npos;
 }
 
 bool Info::is_adapter() const
