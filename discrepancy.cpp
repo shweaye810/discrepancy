@@ -15,6 +15,7 @@ int main()
 {
         ofstream fout;
         ifstream fin;
+
         string in_nm("test.txt"), out_nm("output.txt"), tmp, row;
         cout << "Trying to open " << in_nm << ".\n";
         fin.open(in_nm.c_str());
@@ -33,14 +34,6 @@ int main()
                 return -1;
         }
         ASP list;
-        if (getline(fin, row)) {
-                string t("ASP\tCOD\tPart_No\tPart_Name\tShip_Qty\tLoc");
-                if (row != t) {
-                        cout << "Columns should be in the order shown below.\n" << t << '\n';
-
-                        return -1;
-                }
-        }
 
         while (getline(fin, row)) {
                 if (row.empty())
