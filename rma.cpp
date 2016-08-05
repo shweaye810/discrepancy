@@ -64,8 +64,8 @@ bool is_same_HDD(const Info &l, const Info &r)
         string r_len(get_substr(r, regex_string::HDD_len));
         string l_sp(get_substr(l, regex_string::HDD_speed));
         string r_sp(get_substr(r, regex_string::HDD_speed));
-        string l_cap(get_substr(l, regex_string::HDD_cap));
-        string r_cap(get_substr(r, regex_string::HDD_cap));
+        string l_cap(get_substr(l, regex_string::storage_cap));
+        string r_cap(get_substr(r, regex_string::storage_cap));
         return (((l_len.empty() || r_len.empty()) || l_len == r_len) &&
                 ((l_sp.empty() || r_sp.empty()) || l_sp == r_sp) &&
                 (!l_cap.empty() && !r_cap.empty() && l_cap == r_cap));
@@ -75,8 +75,8 @@ bool is_same_SSD(const Info &l, const Info &r)
 {
         string l_len(get_substr(l, regex_string::HDD_len));
         string r_len(get_substr(r, regex_string::HDD_len));
-        string l_cap(get_substr(l, regex_string::HDD_cap));
-        string r_cap(get_substr(r, regex_string::HDD_cap));
+        string l_cap(get_substr(l, regex_string::storage_cap));
+        string r_cap(get_substr(r, regex_string::storage_cap));
         return (((l_len.empty() || r_len.empty()) || l_len == r_len) &&
                 (!l_cap.empty() && !r_cap.empty() && l_cap == r_cap));
 }
@@ -116,9 +116,12 @@ bool is_same_MB(const Info &l, const Info &r)
         string r_mdl(get_product_model(r.model()));
         string l_cpu(get_substr(l, regex_string::CPU_model));
         string r_cpu(get_substr(r, regex_string::CPU_model));
+        string l_gb(get_substr(l, regex_string::storage_cap));
+        string r_gb(get_substr(r, regex_string::storage_cap));
 
         return ((!(l_mdl.empty() || r_mdl.empty()) && l_mdl == r_mdl) &&
-                ((l_cpu.empty() || r_cpu.empty()) || l_cpu == r_cpu));
+                ((l_cpu.empty() || r_cpu.empty()) || l_cpu == r_cpu) &&
+                ((l_gb.empty() || r_gb.empty()) || l_gb == r_gb));
 }
 
 bool is_same_adapter(const Info &l, const Info &r)
