@@ -1,5 +1,3 @@
-#include <iostream>
-
 namespace regex_string {
         std::regex HDD_len{ R"(([[:s:]][23].5))" };
         std::regex HDD_speed{ R"(([[:s:]][0-9]{4,}R))" };

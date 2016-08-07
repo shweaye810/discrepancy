@@ -6,20 +6,22 @@
 #ifndef RMA_H
 #define RMA_H
 
+/*
+ * @m_info: string -> RMA
+ */
 class RMA{
 public:
         RMA();
         void add();
         void print(std::ostream &, const std::string &s) const;
-        friend std::ostream& operator<<(std::ostream &, const RMA &);
-        void substitude_PN();
+        void substitute_PN();
         void calc_qty();
 private:
         std::map<std::string, std::vector<Info> > m_info;
+
         void proc_loc(Info &, const std::string &, int);
-        void substitude_full_PN();
-        void substitude_HDD();
-        void substitude_all();
+        void substitute_full_PN();
+        void substitute_all();
 };
 
 #endif

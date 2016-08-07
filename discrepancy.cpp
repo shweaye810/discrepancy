@@ -49,11 +49,11 @@ int main()
                 */
         }
         list.calc_qty();
-        list.substitude_PN();
+        list.substitute_PN();
         fout << "ASP\tCOD\tASUS_PN\tPart_Name\tELM\tRTV\txtra_qty\t"
                 "SUB_TOT_QTY\tSUB_PN\tSUB_QTY\n"
                 ;
-        fout << list;
+        list.print(fout);
 
         fin.close();
         fout.close();

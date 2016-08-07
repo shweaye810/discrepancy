@@ -12,6 +12,11 @@ RMA::RMA()
 {
 }
 
+/*
+ * lower(string) - make all string to lower case
+ *
+ * for each char in s, change it to lower case.
+ */
 string lower(string s)
 {
         for (auto itr = s.begin(); itr != s.end(); ++itr) {
@@ -19,6 +24,12 @@ string lower(string s)
         }
         return s;
 }
+/*
+ * proc_loc(Info &, string &, int) - add qty to it's location
+ * @nf: info
+ *
+ * if tmp is rtv, then add qty to rtv, elm other wise.
+ */
 inline void RMA::proc_loc(Info &nf, const string &tmp, int qty)
 {
         if (tmp == "rtv") {
@@ -28,7 +39,13 @@ inline void RMA::proc_loc(Info &nf, const string &tmp, int qty)
         }
 }
 
-void RMA::substitude_full_PN()
+/*
+ * substitude_full_PN() - substitute PN if description matches exactly.
+ *
+ * for each info, if it's done skip, else find info that has extra qty.
+ * if both description matches, then substitute PN.
+ */
+void RMA::substitute_full_PN()
 {
         for (auto i = m_info.begin(); i != m_info.end(); i++) {
                 for (auto j = i->second.begin(); j != i->second.end(); j++) {
@@ -36,13 +53,11 @@ void RMA::substitude_full_PN()
                                 continue;
                         for (auto k = i->second.begin(); k != i->second.end();
                              k++) {
-                                if (k->is_done()) {
+                                if (k->is_done() || j == k || k->xtr_qty < 0)
                                         continue;
-                                }
-                                if ((j != k && k->xtr_qty > 0) &&
-                                    (j->m_mdl.find(k->m_mdl) != string::npos ||
-                                     k->m_mdl.find(j->m_mdl) != string::npos)) {
-                                        j->substitude_PN(*k);
+                                if (j->m_dscr.find(k->m_dscr) != string::npos ||
+                                    k->m_dscr.find(j->m_dscr) != string::npos) {
+                                        j->substitute_PN(*k);
                                         if (j->is_done())
                                                 break;
                                 }
@@ -51,13 +66,25 @@ void RMA::substitude_full_PN()
         }
 }
 
-string get_substr(const Info &o, const regex &rg)
+/*
+ * get_substr() - get the substr from description
+ * @o: other
+ * @RE: regular expression
+ *
+ * return string from description that matches RE.
+ */
+string get_substr(const Info &o, const regex &RE)
 {
         smatch tmp;
-        regex_search(o.model(), tmp, rg);
+        regex_search(o.description(), tmp, RE);
         return tmp[0];
 }
 
+/*
+ * is_same_HDD() - return true if the two HDD are the same
+ *
+ * if both len, sp, and cap are equal, then return true, false otherwise.
+ */
 bool is_same_HDD(const Info &l, const Info &r)
 {
         string l_len(get_substr(l, regex_string::HDD_len));
@@ -71,6 +98,11 @@ bool is_same_HDD(const Info &l, const Info &r)
                 (!l_cap.empty() && !r_cap.empty() && l_cap == r_cap));
 }
 
+/*
+ * is_same_SSD - return true if two SSD are the same
+ *
+ * refer to is_same_HDD for full comment.
+ */
 bool is_same_SSD(const Info &l, const Info &r)
 {
         string l_len(get_substr(l, regex_string::HDD_len));
@@ -81,39 +113,25 @@ bool is_same_SSD(const Info &l, const Info &r)
                 (!l_cap.empty() && !r_cap.empty() && l_cap == r_cap));
 }
 
-void RMA::substitude_HDD()
-{
-        for (auto i = m_info.begin(); i != m_info.end(); i++) {
-                for (auto j = i->second.begin(); j != i->second.end(); j++) {
-                        if (j->is_done() || !j->is_HDD()|| j->has_extra())
-                                continue;
-                        for (auto k = i->second.begin(); k != i->second.end();
-                             k++) {
-                                if (k->is_done())
-                                        continue;
-                                if (j != k && k->has_extra() && k->is_HDD()) {
-                                        bool eq = is_same_HDD(*j, *k);
-                                        if (eq) {
-                                                j->substitude_PN(*k);
-                                                if (j->is_done())
-                                                        break;
-                                        }
-                                }
-                        }
-                }
-        }
-}
-
+/*
+ * get_product_model() - return model of this string(description)
+ */
 string get_product_model(string s)
 {
         stringstream sstrm(s);
         sstrm >> s;
         return s;
 }
+
+/*
+ * is_same_MB - return true if two MB are the same
+ *
+ * refer to is_same_HDD for full comment.
+ */
 bool is_same_MB(const Info &l, const Info &r)
 {
-        string l_mdl(get_product_model(l.model()));
-        string r_mdl(get_product_model(r.model()));
+        string l_mdl(get_product_model(l.description()));
+        string r_mdl(get_product_model(r.description()));
         string l_cpu(get_substr(l, regex_string::CPU_model));
         string r_cpu(get_substr(r, regex_string::CPU_model));
         string l_gb(get_substr(l, regex_string::storage_cap));
@@ -123,7 +141,11 @@ bool is_same_MB(const Info &l, const Info &r)
                 ((l_cpu.empty() || r_cpu.empty()) || l_cpu == r_cpu) &&
                 ((l_gb.empty() || r_gb.empty()) || l_gb == r_gb));
 }
-
+/*
+ * is_same_adapter - return true if two adapter are the same
+ *
+ * refer to is_same_HDD for full comment.
+ */
 bool is_same_adapter(const Info &l, const Info &r)
 {
         string l_wat(get_substr(l, regex_string::adapter_watt));
@@ -135,14 +157,24 @@ bool is_same_adapter(const Info &l, const Info &r)
                 ((l_volt.empty() || r_volt.empty()) || l_volt == r_volt));
 }
 
+/*
+ * is_same_BATT - return true if two batter are the same
+ *
+ * refer to is_same_HDD for full comment.
+ */
 bool is_same_BATT(const Info &l, const Info &r)
 {
-        string l_mdl(get_product_model(l.model()));
-        string r_mdl(get_product_model(r.model()));
+        string l_mdl(get_product_model(l.description()));
+        string r_mdl(get_product_model(r.description()));
 
         return (!(l_mdl.empty() || r_mdl.empty()) && l_mdl == r_mdl);
 }
 
+/*
+ * is_same_LCD - return true if two LCD are the same
+ *
+ * refer to is_same_HDD for full comment.
+ */
 bool is_same_LCD(const Info &l, const Info &r)
 {
         string l_size(get_substr(l, regex_string::LCD_size));
@@ -151,6 +183,11 @@ bool is_same_LCD(const Info &l, const Info &r)
         return (!(l_size.empty() || r_size.empty()) && l_size == r_size);
 }
 
+/*
+ * is_same_DDR - return true if two DDR are the same
+ *
+ * refer to is_same_HDD for full comment.
+ */
 bool is_same_DDR(const Info &l, const Info &r)
 {
         string l_size(get_substr(l, regex_string::DDR_size));
@@ -161,8 +198,10 @@ bool is_same_DDR(const Info &l, const Info &r)
         return ((!(l_size.empty() || r_size.empty()) && l_size == r_size) &&
                 (!(l_speed.empty() || r_speed.empty()) && l_speed == r_speed));
 }
-
-bool is_same_model(const Info &l, const Info &r)
+/*
+ * is_same_description() - return true if both description are the same.
+ */
+bool is_same_description(const Info &l, const Info &r)
 {
         switch(l.product()) {
         case Product_type::adapter:
@@ -180,13 +219,18 @@ bool is_same_model(const Info &l, const Info &r)
         case Product_type::SSD:
                 return is_same_SSD(l, r);
         default:
-                cout << "check is_same_model().\nModel: " << l.model() << '\n';
+                cout << "check is_same_description().\nModel: " << l.description() << '\n';
                 break;
         }
         return false;
 }
 
-void RMA::substitude_all()
+/*
+ * substitude_all() - substitute PN of all infos
+ *
+ * refer to substitute_full_PN() for full comment
+ */
+void RMA::substitute_all()
 {
         for (auto i = m_info.begin(); i != m_info.end(); i++) {
                 for (auto j = i->second.begin(); j != i->second.end(); j++) {
@@ -198,9 +242,9 @@ void RMA::substitude_all()
                                         continue;
                                 if (j != k && k->has_extra() &&
                                     (k->product() == j->product())) {
-                                        bool eq = is_same_model(*j, *k);
+                                        bool eq = is_same_description(*j, *k);
                                         if (eq) {
-                                                j->substitude_PN(*k);
+                                                j->substitute_PN(*k);
                                                 if (j->is_done())
                                                         break;
                                         }
@@ -210,16 +254,21 @@ void RMA::substitude_all()
         }
 }
 
-void RMA::substitude_PN()
-{
-        substitude_full_PN();
-        //        substitude_HDD();
-        substitude_all();
-}
 /*
+ * substitute_PN() - name says all.
+ */
+void RMA::substitute_PN()
+{
+        substitute_full_PN();
+        substitute_all();
+}
+
+/*
+ * add() - add info to RMA
  *
- *
- *
+ * Get all info for Info members, process location. If RMA doesn't exists, map
+ * RMA and Info, else find info. If found, add qty to the info, else,
+ * add new info to Info container.
  */
 void RMA::add()
 {
@@ -246,39 +295,32 @@ void RMA::add()
         }
 }
 
+/*
+ * print() - print the each RMA and Info
+ *
+ * for each rma, print infos.
+ */
 void RMA::print(ostream &cout, const std::string &s) const
 {
-        for (auto itr = this->m_info.begin();
-             itr != this->m_info.end();
-             ++itr) {
-                for (auto iitr = itr->second.begin();
-                     iitr != itr->second.end();
-                     ++iitr) {
-                        cout << s << '\t' << itr->first << '\t' << *iitr;
-                        cout << endl;
+        for (auto i = this->m_info.begin(); i != this->m_info.end(); ++i) {
+                auto &v = i->second;
+                for (auto ii = v.begin(); ii != v.end(); ++ii) {
+                        cout << s << '\t' << i->first << '\t' << *ii << endl;
                 }
         }
 }
-ostream& operator<<(ostream &cout, const RMA &rma)
-{
-        for (auto itr = rma.m_info.begin(); itr != rma.m_info.end(); ++itr) {
-                for (auto iitr = itr->second.begin();
-                     iitr != itr->second.end();
-                     ++iitr) {
-                        cout << itr->first << '\t' << *iitr << endl;
-                }
-        }
-        return cout;
 
-}
-
+/*
+ * calc_qty() - calculate quantity
+ *
+ * for each rma, calculate each info's qty.
+ */
 void RMA::calc_qty()
 {
-        for (auto itr = m_info.begin(); itr != m_info.end(); ++itr) {
-                for (auto iitr = itr->second.begin();
-                     iitr != itr->second.end();
-                     ++iitr) {
-                        iitr->calc_qty();
+        for (auto i = m_info.begin(); i != m_info.end(); ++i) {
+                auto &v = i->second;
+                for (auto ii = v.begin(); ii != v.end(); ++ii) {
+                        ii->calc_qty();
                 }
         }
 }

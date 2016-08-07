@@ -7,7 +7,13 @@ using namespace std;
 ASP::ASP()
 {
 }
-
+/*
+ * add() - fill data for ASP
+ * @s: a row of input data
+ *
+ * sets string in Tokenizer and get token. if asp_nm is already in the map
+ * append it, else add to the map.
+ */
 void ASP::add(string s)
 {
         Tokenizer::set_string(s);
@@ -22,20 +28,24 @@ void ASP::add(string s)
         }
 }
 
-ostream& operator<<(ostream &cout, const ASP &asp)
+/*
+ * print() - print all ASP and RMA
+ *
+ * for each row, print ASP and let RMA::print() do the rest.
+ */
+void ASP::print(ostream &out)
 {
-        for (auto itr = asp.m_row.begin(); itr != asp.m_row.end(); ++itr) {
-                /*for (auto iitr = itr->second.begin();
-                     iitr != itr->second.end();
-                     ++iitr) {
-                        cout << itr->first << '\t' << *iitr << endl;
-                        }*/
-                //cout << itr->first << '\t' << itr->second;
-                itr->second.print(cout, itr->first);
+        for (auto itr = m_row.begin(); itr != m_row.end(); ++itr) {
+                itr->second.print(out, itr->first);
         }
-        return cout;
 }
 
+/*
+ * calc_qty() - calculate the quantity: needed or extra
+ *
+ * for each ASP, call the helper function from RMA class to calculate the
+ * quantity.
+ */
 void ASP::calc_qty()
 {
         for (auto itr = m_row.begin(); itr != m_row.end(); ++itr) {
@@ -43,9 +53,14 @@ void ASP::calc_qty()
         }
 }
 
-void ASP::substitude_PN()
+/*
+ * substitute_PN() - substitute PN for all ASP
+ *
+ * for each ASP, call the helper function from RMA class to substitute PN.
+ */
+void ASP::substitute_PN()
 {
         for (auto itr = m_row.begin(); itr != m_row.end(); ++itr) {
-                itr->second.substitude_PN();
+                itr->second.substitute_PN();
         }
 }

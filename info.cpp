@@ -4,24 +4,39 @@
 
 using namespace std;
 
-Info::Info(string part_n, string model) :
-        m_pn(part_n), m_mdl(model), m_elm(0), m_rtv(0), xtr_qty(0),
+/*
+ * Info() - constructor of Info that takes two agruments
+ * @part_n: part number
+ * @descrip: description
+ *
+ * Initialize PN and description and the rest to 0.
+ */
+Info::Info(string part_n, string descrip) :
+        m_pn(part_n), m_dscr(descrip), m_elm(0), m_rtv(0), xtr_qty(0),
         m_sub_tot(0), prod_t(Product_type::NA)
 {
 
 }
 
-
+/*
+ * Info(Const Info &) - Copy o to this
+ * o: other
+ *
+ * Copy all the members of o to this.
+ */
 Info::Info(const Info &o) :
-        m_pn(o.m_pn), m_mdl(o.m_mdl), m_elm(o.m_elm), m_rtv(o.m_rtv),
+        m_pn(o.m_pn), m_dscr(o.m_dscr), m_elm(o.m_elm), m_rtv(o.m_rtv),
         xtr_qty(o.xtr_qty), m_sub_tot(o.m_sub_tot), m_sub(o.m_sub),
         prod_t(o.prod_t)
 {
 }
 
+/*
+ * operator<<() overload
+ */
 ostream& operator<<(ostream &cout, const Info &info)
 {
-        cout << info.m_pn << '\t' << info.m_mdl << '\t' << info.m_elm << '\t'
+        cout << info.m_pn << '\t' << info.m_dscr << '\t' << info.m_elm << '\t'
              << info.m_rtv << '\t'<< info.xtr_qty << '\t'
              << info.m_sub_tot << '\t';
 
@@ -32,11 +47,18 @@ ostream& operator<<(ostream &cout, const Info &info)
         return cout;
 }
 
+/*
+ * is_done() - return true if this row is done
+ */
 bool Info::is_done()
 {
         return xtr_qty == 0;
 }
-
+/*
+ * calc_qty() - calculate the extra qty of this row
+ *
+ * calculate extra qty. extra qty = elm - rtv + sub_tot
+ */
 void Info::calc_qty()
 {
         xtr_qty = m_elm - m_rtv + m_sub_tot;
@@ -47,44 +69,66 @@ int Info::extra_qty() const
         return xtr_qty;
 }
 
+/*
+ * is_HDD() - return true if description is HDD
+ *
+ * if description contains SATA, but SSD, then return true, false otherwies.
+ */
 bool Info::is_HDD() const
 {
-        return m_mdl.find("SATA") != string::npos &&
-                m_mdl.find("SSD") == string::npos;
+        return m_dscr.find("SATA") != string::npos &&
+                m_dscr.find("SSD") == string::npos;
 }
 
+/*
+ * is_MB() - return true if description is motherboard
+ *
+ * if description contains MB or MAIN, then return true.
+ */
 bool Info::is_MB() const
 {
-        return m_mdl.find("MB") != string::npos ||
-                m_mdl.find("MAIN") != string::npos;
+        return m_dscr.find("MB") != string::npos ||
+                m_dscr.find("MAIN") != string::npos;
 }
 
+/*
+ * is_BATT() - return true if description is battery
+ *
+ * if description contains BATT or BAT, then return true.
+ */
 bool Info::is_BATT() const
 {
-        return m_mdl.find("BATT") != string::npos ||
-		m_mdl.find(" BAT") != string::npos;
+        return m_dscr.find("BATT") != string::npos ||
+                m_dscr.find(" BAT") != string::npos;
 }
 
 bool Info::is_adapter() const
 {
-        return m_mdl.find("ADAPTER") != string::npos;
+        return m_dscr.find("ADAPTER") != string::npos;
 }
 
 bool Info::is_LCD() const
 {
-        return m_mdl.find("LCD") != string::npos;
+        return m_dscr.find("LCD") != string::npos;
 }
 
 bool Info::is_DDR() const
 {
-        return m_mdl.find("DDR") != string::npos;
+        return m_dscr.find("DDR") != string::npos;
 }
 
 bool Info::is_SSD() const
 {
-        return m_mdl.find("SSD") != string::npos;
+        return m_dscr.find("SSD") != string::npos;
 }
 
+/*
+ * get_qty(Info &, Info &) - get qty to substitute.
+ * @l, r: left and right respectively
+ *
+ * if absolute of left is less than right, return absolute of less, right
+ * otherwise.
+ */
 int get_qty(const Info &l, const Info &r)
 {
         return abs(l.extra_qty()) < r.extra_qty() ?
@@ -96,7 +140,15 @@ bool Info::has_extra()
         return xtr_qty > 0;
 }
 
-void Info::substitude_PN(Info &o)
+/*
+ * substitutde_PN(Info &) - substitute the PN and qty with this and o
+ * @o: other
+ *
+ * get the quantity to substitute. add other PN and qty to substitute container;
+ * add qty to m_sub_tot. subtract qty form o. calculate final qty of this and o
+ * by calling calc_qty().
+ */
+void Info::substitute_PN(Info &o)
 {
         int qty = get_qty(*this, o);
         this->m_sub[o.m_pn] = qty;
@@ -106,11 +158,16 @@ void Info::substitude_PN(Info &o)
         o.calc_qty();
 }
 
-const string &Info::model() const
+const string &Info::description() const
 {
-        return m_mdl;
+        return m_dscr;
 }
 
+/*
+ * set_product_type() - set the product type of this
+ *
+ * if adapter, set it to adapter, etc.
+ */
 void Info::set_product_type()
 {
         if (is_adapter()) {
@@ -129,6 +186,9 @@ void Info::set_product_type()
                 prod_t = Product_type::SSD;
         }
 }
+/*
+ * product() - return product type of this
+ */
 Product_type Info::product() const
 {
         return prod_t;
