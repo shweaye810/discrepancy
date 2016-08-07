@@ -55,8 +55,7 @@ void RMA::substitute_full_PN()
                              k++) {
                                 if (k->is_done() || j == k || k->xtr_qty < 0)
                                         continue;
-                                if (j->m_dscr.find(k->m_dscr) != string::npos ||
-                                    k->m_dscr.find(j->m_dscr) != string::npos) {
+                                if (j->m_dscr == k->m_dscr) {
                                         j->substitute_PN(*k);
                                         if (j->is_done())
                                                 break;
