@@ -27,4 +27,4 @@ tokenizer.o: tokenizer.cpp tokenizer.h
 
 .PHONY: clean
 clean:
-	rm -f *.o *.out *.exe
+	rm -f *.o *.out *.exe debug* output.txt
