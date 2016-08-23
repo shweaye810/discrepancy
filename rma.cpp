@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <regex>
+#include <fstream>
 
 #include "rma.h"
 #include "regex_string.cpp"
@@ -202,6 +203,10 @@ bool is_same_DDR(const Info &l, const Info &r)
  */
 bool is_same_description(const Info &l, const Info &r)
 {
+        string debug_file("debug_msg.txt");
+        static ofstream ferr(debug_file);
+        if(!ferr.is_open())
+                cout << "Error opening " << debug_file << ".\n";
         switch(l.product()) {
         case Product_type::adapter:
                 return is_same_adapter(l, r);
@@ -218,7 +223,8 @@ bool is_same_description(const Info &l, const Info &r)
         case Product_type::SSD:
                 return is_same_SSD(l, r);
         default:
-                cout << "check is_same_description().\nModel: " << l.description() << '\n';
+                ferr << "check is_same_description().\nModel: "
+                     << l.description() << '\n';
                 break;
         }
         return false;
